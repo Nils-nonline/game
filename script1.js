@@ -67,15 +67,20 @@ document.body.addEventListener("click", async () => {
 	if(!document.pointerLockElement) {
 		await renderer.domElement.requestPointerLock({unadjustedMovement: true});
 	}else{
-		
 		if(zoom){
 			if(!tools[actualWeapon][1].repeated){
 				if(!tools[actualWeapon][1].lastshot){
 					tools[actualWeapon][1].lastshot = Date.now() - tools[actualWeapon][1].cooldown*2
 				}
 				if(tools[actualWeapon][1].lastshot < Date.now() - tools[actualWeapon][1].cooldown){
-					shoot();
-					dezoom();
+					if(tools[actualWeapon][1].zooming){
+						tools[actualWeapon][1].zooming = false;
+						dezoom();
+						shoot();
+					}else{
+						tools[actualWeapon][1].zooming = true;
+						zoom();
+					}
 					tools[actualWeapon][1].lastshot = Date.now();
 				}
 			}else{
@@ -92,35 +97,27 @@ document.body.addEventListener("mousedown", async () => {
 		if(!tools[actualWeapon][1].lastshot){
 			tools[actualWeapon][1].lastshot = Date.now() - tools[actualWeapon][1].cooldown*2
 		}
-		if(tools[actualWeapon][1].lastshot < Date.now() - tools[actualWeapon][1].cooldown){
-			if(document.pointerLockElement){
-				if(zoom){
-					if(!tools[actualWeapon][1].repeated){
-						zoom();
-					}else{
-						if(tools[actualWeapon][1].actualMag > 0){
-							if(interval){
-								clearInterval(interval);
-							}
-							shoot();
-							tools[actualWeapon][1].lastshot = Date.now();
-							tools[actualWeapon][1].actualMag-=1;
-							interval = setInterval(()=>{
-								if(tools[actualWeapon][1].actualMag > 0){
-									shoot();
-									tools[actualWeapon][1].lastshot = Date.now();
-									tools[actualWeapon][1].actualMag-=1;
-								}else{
-									setTimeout((w)=>{w.actualMag=w.mag},tools[actualWeapon][1].reloadtime,tools[actualWeapon][1]);
-								}
-							}, tools[actualWeapon][1].cooldown);
-						}else{
-							setTimeout((w)=>{w.actualMag=w.mag},tools[actualWeapon][1].reloadtime,tools[actualWeapon][1]);
-						}
-					}
+		if(tools[actualWeapon][1].lastshot < Date.now() - tools[actualWeapon][1].cooldown && document.pointerLockElement && zoom && tools[actualWeapon][1].repeated){
+			if(tools[actualWeapon][1].actualMag > 0){
+				if(interval){
+					clearInterval(interval);
 				}
-			
+				shoot();
+				tools[actualWeapon][1].lastshot = Date.now();
+				tools[actualWeapon][1].actualMag-=1;
+				interval = setInterval(()=>{
+					if(tools[actualWeapon][1].actualMag > 0){
+						shoot();
+						tools[actualWeapon][1].lastshot = Date.now();
+						tools[actualWeapon][1].actualMag-=1;
+					}else{
+						setTimeout((w)=>{w.actualMag=w.mag},tools[actualWeapon][1].reloadtime,tools[actualWeapon][1]);
+					}
+				}, tools[actualWeapon][1].cooldown);
+			}else{
+				setTimeout((w)=>{w.actualMag=w.mag},tools[actualWeapon][1].reloadtime,tools[actualWeapon][1]);
 			}
+		
 		}
 	}
 });
@@ -270,7 +267,7 @@ function fill(pos) {
   // Store the center position of the newly generated chang area
   changAreas.push(pos);
 }
-var change = [0, 0, Math.PI]
+var change = [0, 0, Math.PI,0]
 var ableToJump = true
 
 var intheAir = false;
@@ -292,15 +289,15 @@ document.addEventListener('mousemove', (event) => {
 });
 
 function keypress(event) {
-  if (event.keyCode == 65) { change[0] = 1*speed }
+  if (event.keyCode == 65) { change[3] = 1*speed }
   if (event.keyCode == 87) { if(intheAir){change[1] = -9*speed}else{change[1] = -3*speed} }
-  if (event.keyCode == 68) { change[0] = -1*speed }
+  if (event.keyCode == 68) { change[3] = -1*speed }
   if (event.keyCode == 83) { if(intheAir){change[1] = 9*speed}else{change[1] = 3*speed} }
   if (event.keyCode == 90 || event.keyCode == 89){
     zoom();
   }
   if (event.keyCode == 51){camera.zoom = 0.5;camera.updateProjectionMatrix();}
-  if (event.keyCode == 49){
+  if (event.keyCode == 81){
 		if(interval){
 			clearInterval(interval);
 		}
@@ -315,34 +312,7 @@ function keypress(event) {
      }
     console.log(actualWeapon)
   }
-  if (event.keyCode == 32) {
-		if(tools[actualWeapon]){
-			if(!tools[actualWeapon][1].lastshot){
-				tools[actualWeapon][1].lastshot = Date.now() - tools[actualWeapon][1].cooldown*2
-			}
-			if(tools[actualWeapon][1].lastshot < Date.now() - tools[actualWeapon][1].cooldown){
-				if(tools[actualWeapon][1].actualMag > 0){
-					if(document.pointerLockElement){
-						if(zoom){
-							if(!tools[actualWeapon][1].repeated){
-								zoom();
-							}else{
-								if(interval){
-									clearInterval(interval);
-								}
-								tools[actualWeapon][1].lastshot = Date.now();
-								shoot();
-								tools[actualWeapon][1].actualMag-=1;
-							}
-						}
-					}
-				}else{
-					setTimeout((w)=>{w.actualMag=w.mag},tools[actualWeapon][1].reloadtime,tools[actualWeapon][1]);
-				}
-			}
-		}
-  }
-  if (ableToJump && event.keyCode == 70) {cube.mesh.position.y += 4;if(!checkCollision()){intheAir = true; ableToJump = false;  window.setTimeout(jumpend, 1000)}else{cube.mesh.position.y -= 4;}}
+  if (ableToJump && event.keyCode == 32) {cube.mesh.position.y += 4;if(!checkCollision()){intheAir = true; ableToJump = false;  window.setTimeout(jumpend, 1000)}else{cube.mesh.position.y -= 4;}}
 }
 
 function keyup(event) {
@@ -350,25 +320,8 @@ function keyup(event) {
   if (event.keyCode == 65) { change[0] = 0 }
   if (event.keyCode == 87) { change[1] = 0 }
   if (event.keyCode == 68) { change[0] = 0 }
-	if (event.keyCode == 32) {
-		if(zoom){
-			if(!tools[actualWeapon][1].repeated){
-				if(!tools[actualWeapon][1].lastshot){
-					tools[actualWeapon][1].lastshot = Date.now() - tools[actualWeapon][1].cooldown*2
-				}
-				if(tools[actualWeapon][1].lastshot < Date.now() - tools[actualWeapon][1].cooldown){
-					shoot();
-					dezoom();
-					tools[actualWeapon][1].lastshot = Date.now();
-				}
-			}else{
-				clearInterval(interval);
-				dezoom();
-			}
-		}
-	}
   if (event.keyCode == 83) { change[1] = 0 }
-  if (event.keyCode == 70) { jumpend() }
+  if (event.keyCode == 32) { jumpend() }
 }
 
 document.onkeydown = keypress
@@ -397,6 +350,7 @@ function isEnemy(obj){
 	};
 	return false;
 }
+/*var animatingFog = false;
 function animateFog(to,speed=100){
 	let number = scene.fog.far;
 	let fogIntervall = setInterval(
@@ -404,6 +358,7 @@ function animateFog(to,speed=100){
 			try{
 				if(number == to){
 					 clearInterval(fogIntervall);
+						animatingFog=false
 				 }else{
 					 number += (to-number)/10
 					 scene.fog.far = number;
@@ -411,14 +366,13 @@ function animateFog(to,speed=100){
 			}catch(e){
 				alert(e);
 			}
-			
 		},speed);
-}
+}*/
 function sandstorm(isSandstorm=true){
 	if(isSandstorm){
-		animateFog(20);
+		scene.fog.far =20;
 	}else{
-		animateFog(100);
+		 scene.fog.far =100;
 	}
 }
 
@@ -531,48 +485,41 @@ function calculateMiddle(x){
     return x - (x % (changHalfSize * 2)) - changHalfSize
   }
 }
-actualWeapon = 0;
-function render() {
-	if(playerLifes<=0){
-		message("THE END","You have been killed by the enemies.<br>The game will restart automatically.","red");
-		intheAir = true;
-		cube.mesh.position.y += 40
-		setTimeout(function(){location.reload();},1000);
-		return;
-	}
-  
-  // Render the scene and the camera
-  angle +=  change[0];
-  cube.mesh.position.z += Math.cos(angle / 180 * Math.PI) * (change[1] * steps)
-  cube.mesh.position.x += Math.sin(angle / 180 * Math.PI) * (change[1] * steps)
-  cube.mesh.rotation.y = angle / 180 * Math.PI
-  camera.rotation.y = angle / 180 * Math.PI
-  camera.position.z = cube.mesh.position.z + Math.cos(angle / 180 * Math.PI) * 1.5
-  camera.position.y = cube.mesh.position.y + 1.5
-  camera.position.x = cube.mesh.position.x + Math.sin(angle / 180 * Math.PI) * 1.5
-  
+
+function walk(){
+	angle +=  change[0];
+	cube.mesh.position.z += Math.cos(angle / 180 * Math.PI) * (change[1] * steps)
+	cube.mesh.position.x += Math.sin(angle / 180 * Math.PI) * (change[1] * steps)
+	cube.mesh.position.z += Math.cos((angle-90) / 180 * Math.PI) * (change[3] * steps)
+	cube.mesh.position.x += Math.sin((angle-90) / 180 * Math.PI) * (change[3] * steps)
+	cube.mesh.rotation.y = angle / 180 * Math.PI
+	camera.rotation.y = angle / 180 * Math.PI
+	camera.position.z = cube.mesh.position.z + Math.cos(angle / 180 * Math.PI) * 1.5
+	camera.position.y = cube.mesh.position.y + 1.5
+	camera.position.x = cube.mesh.position.x + Math.sin(angle / 180 * Math.PI) * 1.5
+
 	if (checkCollision(cube,true)){
-    cube.mesh.position.z += Math.cos(angle / 180 * Math.PI) * (-change[1] * steps)
-    cube.mesh.position.x += Math.sin(angle / 180 * Math.PI) * (-change[1] * steps)
-    cube.mesh.rotation.y = angle / 180 * Math.PI
-    camera.rotation.y = angle / 180 * Math.PI
-    camera.position.z = cube.mesh.position.z
-    camera.position.y = cube.mesh.position.y + 1
-    camera.position.x = cube.mesh.position.x
-  }
-  camera.lookAt(new THREE.Vector3(camera.position.x+Math.sin(angle / 180 * Math.PI) * Math.cos(change[2])* 10,camera.position.y+ Math.sin(change[2])*10,camera.position.z+Math.cos(angle / 180 * Math.PI) * Math.cos(change[2]) * 10));
-  const cubeX = cube.mesh.position.x;
-  const cubeZ = cube.mesh.position.z;
-  const duneheight = getFirstIntersection(cube.mesh.position.x,cube.mesh.position.y,cube.mesh.position.z,0.5,cube).y  
-  let changPosition = [calculateMiddle(cubeX), calculateMiddle(cubeZ)]
-  for (let x of [changHalfSize*2, 0, -2*changHalfSize]) {
-    for (let y of [changHalfSize*2, 0, -2*changHalfSize]) {
-      fill([changPosition[0] + x, changPosition[1] + y])
-    }
-  }
-  if(insideCube()!== false){
-    cube.mesh.position.y = insideCube()+0.6
-  }
+		cube.mesh.position.z += Math.cos(angle / 180 * Math.PI) * (-change[1] * steps)
+		cube.mesh.position.x += Math.sin(angle / 180 * Math.PI) * (-change[1] * steps)
+		cube.mesh.rotation.y = angle / 180 * Math.PI
+		camera.rotation.y = angle / 180 * Math.PI
+		camera.position.z = cube.mesh.position.z
+		camera.position.y = cube.mesh.position.y + 1
+		camera.position.x = cube.mesh.position.x
+	}
+	camera.lookAt(new THREE.Vector3(camera.position.x+Math.sin(angle / 180 * Math.PI) * Math.cos(change[2])* 10,camera.position.y+ Math.sin(change[2])*10,camera.position.z+Math.cos(angle / 180 * Math.PI) * Math.cos(change[2]) * 10));
+	const cubeX = cube.mesh.position.x;
+	const cubeZ = cube.mesh.position.z;
+	const duneheight = getFirstIntersection(cube.mesh.position.x,cube.mesh.position.y,cube.mesh.position.z,0.5,cube).y  
+	let changPosition = [calculateMiddle(cubeX), calculateMiddle(cubeZ)]
+	for (let x of [changHalfSize*2, 0, -2*changHalfSize]) {
+		for (let y of [changHalfSize*2, 0, -2*changHalfSize]) {
+			fill([changPosition[0] + x, changPosition[1] + y])
+		}
+	}
+	if(insideCube()!== false){
+		cube.mesh.position.y = insideCube()+0.6
+	}
 	if(!intheAir){
 		if(!checkCollision()){
 			cube.mesh.position.y-=0.1
@@ -584,23 +531,34 @@ function render() {
 		}
 	}
 	camera.position.y = cube.mesh.position.y + 1
-  //plane.position.x = cube.mesh.position.x
-  //plane.position.z = cube.mesh.position.z
+	//plane.position.x = cube.mesh.position.x
+	//plane.position.z = cube.mesh.position.z
 	dune();
-  if(tools[actualWeapon] != undefined){
-    tools[actualWeapon][0].position.x = cubeX + Math.sin((angle) / 180 * Math.PI) * -0.1;
-    tools[actualWeapon][0].position.z = cubeZ + Math.cos((angle) / 180 * Math.PI) * -0.1;
-    tools[actualWeapon][0].position.y = cube.mesh.position.y+0.3;
-    tools[actualWeapon][0].rotation.y = (angle+tools[actualWeapon][0].___turn[0]) / 180 * Math.PI;
-  }
+	if(tools[actualWeapon] != undefined){
+		tools[actualWeapon][0].position.x = cubeX + Math.sin((angle) / 180 * Math.PI) * -0.1;
+		tools[actualWeapon][0].position.z = cubeZ + Math.cos((angle) / 180 * Math.PI) * -0.1;
+		tools[actualWeapon][0].position.y = cube.mesh.position.y+0.3;
+		tools[actualWeapon][0].rotation.y = (angle+tools[actualWeapon][0].___turn[0]) / 180 * Math.PI;
+	}
+}
+function render() {
+	if(playerLifes<=0){
+		message("THE END","You have been killed by the enemies.<br>The game will restart automatically.","red");
+		intheAir = true;
+		cube.mesh.position.y += 40
+		setTimeout(function(){location.reload();},1000);
+		return;
+	}
+  
+  // Render the scene and the camera
   renderer.render(scene, camera);
 	spotlight.position.set(cube.mesh.position.x, cube.mesh.position.y+5, cube.mesh.position.z);
   requestAnimationFrame(render);
 }
 
-
-
+actualWeapon = 0;
 setInterval(()=>{
+	walk();
 	for(let enemy of enemies){
 		if(true || enemy.mesh.shot.length == 0){
 			enemy.mesh.position.y = 0.1+enemy.mesh.geometry.parameters.height/2+getFirstIntersection(enemy.mesh.position.x,enemy.mesh.position.y,enemy.mesh.position.z,1,enemy).y
