@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Desert Shooter</title>
+	<style>
+		body {
+			background:  linear-gradient(0deg, rgba(239,191,0,1) 0%, rgba(247,236,140,1) 62%, rgba(255,255,255,1) 100%);
+			background-size: 400% 400%;
+			animation: gradient 15s ease infinite;
+			height: 100vh;
+			font-family: Arial, sans-serif;
+		}
+
+		@keyframes gradient {
+			0% {
+				background-position: 50% 0%;
+			}
+
+			50% {
+				background-position: 50% 100%;
+			}
+
+			100% {
+				background-position: 50% 0%;
+			}
+		}
+
+		.container {
+			text-align: center;
+			margin-top: 100px;
+		}
+
+		.description {
+			font-size: 20px;
+			margin-bottom: 20px;
+		}
+
+		.start-button {
+			padding: 10px 20px;
+			font-size: 18px;
+			cursor: pointer;
+			border: 2px solid #000;
+			background-color: lightgray;
+		}
+
+		.start-button:hover {
+			background-color: gray;
+			color: white;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<h1>Welcome to Desert Shooter</h1>
+		<p class="description">Get ready to experience the ultimate first person shooter game set in the desert!</p>
+		<button class="start-button" onclick="location.href+='/game.html'">Start the Game</button>
+	</div>
+
+</body>
+
+</html>
