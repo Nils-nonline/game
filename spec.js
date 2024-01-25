@@ -1,4 +1,4 @@
-var fileNames = {"FBX/Pistol_02.fbx":{scale:0.001,tx:0,ty:180,tz:0,name:"handgun",publicinf:{name:"Handgun",
+var fileNames = {"FBX/Pistol_02.fbx":{scale:0.001,tx:0,ty:180,tz:90,name:"handgun",publicinf:{name:"Handgun",
 																																														 repeated:true,
 																																														 mag:1,
 																																														 reloadtime:1000,
@@ -6,7 +6,7 @@ var fileNames = {"FBX/Pistol_02.fbx":{scale:0.001,tx:0,ty:180,tz:0,name:"handgun
 																																														 damage:250
 																																														}
 																		 },
-								 "FBX/AssaultRifle_02.fbx":{scale:0.004,tx:0,ty:0,tz:0,name:"M4",publicinf:{name:"M4", //checked
+								 "FBX/AssaultRifle_02.fbx":{scale:0.004,tx:90,ty:0,tz:0,name:"M4",publicinf:{name:"M4", //checked
 																																															repeated:true,
 																																															mag:30,
 																																															reloadtime:1600,

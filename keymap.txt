@@ -1,0 +1,15 @@
+W/A/S/D: Move around
+R: Reload
+C: Crouch
+T: Call air support (large area bombing)
+Q: Activate a small auto-navigation drone
+E: Activate special weapon
+X: Grenade withdrawal
+G: Melee Attack
+1 & 2: Weapon change
+3: Grenade
+4: Call reconnaissance aircraft (Locate enemies)
+Ctrl: Hide/Display cursor
+Left click: Open fire
+Right click: Open aiming
+Space: Jump
