@@ -1,12 +1,13 @@
 var fileNames = {
-	"FBX/Pistol_02.fbx": {
-		scale: 0.001, tx: 0, ty: 180, tz: 90, name: "handgun", publicinf: {
-			name: "Handgun",
+	"FBX/Revolver_02.fbx": { //checked
+		scale: 0.002, tx: 0, ty: 180, tz: 0, name: "NYX 357", publicinf: {
+			name: "NYX .357",
 			repeated: true,
-			mag: 1,
-			reloadtime: 1000,
-			cooldown: 500,
-			damage: 250
+			mag: 6,
+			reloadtime: 2000,
+			fastreloadtime: 1500,
+			cooldown: 460,
+			damage: 95
 		}
 	},
 	"FBX/AssaultRifle_02.fbx": {
@@ -14,7 +15,8 @@ var fileNames = {
 			name: "M4", //checked
 			repeated: true,
 			mag: 30,
-			reloadtime: 1600,
+			reloadtime: 2000,
+			fastreloadtime: 1600,
 			cooldown: 80,
 			damage: 35
 		}
@@ -24,28 +26,31 @@ var fileNames = {
 			name: "Herstal 762", //checked
 			repeated: true,
 			mag: 20,
-			reloadtime: 1800,
+			fastreloadtime: 1800,
+			reloadtime: 2100,
 			cooldown: 97,
 			damage: 40
 		}
 	},
 
 	"FBX/AssaultRifle_03.fbx": {
-		scale: 0.004, tx: 0, ty: 180, tz: 0, name: "thevis 223", publicinf: {
-			name: "Thevis 223", //checked
+		scale: 0.004, tx: 0, ty: 0, tz: 0, name: "thevis 223", publicinf: {
+			name: "Thevis .223", //checked
 			repeated: true,
 			mag: 30,
-			reloadtime: 1900,
+			fastreloadtime: 1900,
+			reloadtime: 2400,
 			cooldown: 72,
 			damage: 33
 		}
 	},
 	"FBX/AssaultRifle_02.fbx": {
-		scale: 0.004, tx: 0, ty: 180, tz: 0, name: "thevis 9mm", publicinf: {
+		scale: 0.004, tx: 0, ty: 0, tz: 0, name: "thevis 9mm", publicinf: {
 			name: "Thevis 9mm", //checked
 			repeated: true,
 			mag: 30,
-			reloadtime: 1400,
+			fastreloadtime: 1400,
+			reloadtime: 1600,
 			cooldown: 68,
 			damage: 29
 		}
@@ -53,17 +58,19 @@ var fileNames = {
 	/*"FBX/Kerbrat_MP.fbx":{scale:0.004,tx:0,ty:0,tz:0,name:"kerbrat mp",publicinf:{name:"Kerbrat MP", //checked
 																																										 repeated:true,
 																																										 mag:30,
-																																										 reloadtime:1500,
+																																										 fastreloadtime:1500,
+																																										 reloadtime:1900,
 																																										 cooldown:50,
 																																										 damage:25
 																																										 }
 	},*/
 	"FBX/SubmachineGun_04.fbx": {
-		scale: 0.004, tx: 0, ty: 180, tz: 0, name: "izhmash bizon", publicinf: {
+		scale: 0.004, tx: 0, ty: 0, tz: 0, name: "izhmash bizon", publicinf: {
 			name: "Izhmash Bizon", //checked
 			repeated: true,
 			mag: 64,
-			reloadtime: 1800,
+			reloadtime: 2200,
+			fastreloadtime: 1800,
 			cooldown: 90,
 			damage: 32
 		}

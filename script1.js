@@ -24,7 +24,7 @@ document.body.appendChild(renderer.domElement);
 var planeGeometry = new THREE.PlaneGeometry(500, 500, 40, 40);
 var playerLifes = 150;
 var cubeLives = 150;
-var cubeDamage = 20;
+var cubeDamage = 0;//20;
 //0xf0e68c
 var material = new THREE.MeshPhongMaterial({ color: 0xf0e68c, side: THREE.DoubleSide });
 // Create a mesh using the geometry and material
@@ -111,6 +111,8 @@ document.body.addEventListener("mousedown", async () => {
 				interval = setInterval(() => {
 					if (tools[actualWeapon][1].actualMag > 0) {
 						shoot();
+						//CHANGE//
+						change[2] -= 0.5 /180 * Math.PI;
 						tools[actualWeapon][1].lastshot = Date.now();
 						tools[actualWeapon][1].actualMag -= 1;
 						if(tools[actualWeapon][1].actualMag == 0){
@@ -156,12 +158,14 @@ for (const file of Object.keys(fileNames)) {
 		try {
 			scale = fileNames[file].scale;
 			turn = [fileNames[file].tx, fileNames[file].ty, fileNames[file].tz];
+			console.log(scale, turn);
 		} catch (e) {
 			console.log(e.message);
 			console.log(fileNames[file].scale);
 		}
 		console.log("scaling");
-		console.log(obj.material);
+		
+		console.log(obj.children[0].material);
 		try {
 			for (let i = 0; i < obj.children[0].material.length; i++) {
 				for (let child_i = 0; child_i < obj.children.length; child_i++) {
@@ -326,6 +330,16 @@ function keypress(event) {
 function keyup(event) {
 	if (event.keyCode == 90 || event.keyCode == 89 || event.keyCode == 51) { dezoom() }
 	if (event.keyCode == 65) { change[0] = 0 }
+	if (event.keyCode == 82 && tools[actualWeapon][1].actualMag > 0 && tools[actualWeapon][1].actualMag != tools[actualWeapon][1].mag) {
+														tools[actualWeapon][0].isReloading = true;
+														setTimeout((w,a_w) => { w.actualMag = w.mag;
+																									a_w.isReloading = false
+																								 }, 
+																			tools[actualWeapon][1].fastreloadtime,
+																			tools[actualWeapon][1],
+																			tools[actualWeapon][0]
+																			); 
+													 }
 	if (event.keyCode == 87) { change[1] = 0 }
 	if (event.keyCode == 68) { change[0] = 0 }
 	if (event.keyCode == 83) { change[1] = 0 }
@@ -545,7 +559,7 @@ function walk() {
 		tools[actualWeapon][0].position.x = cubeX + Math.sin((angle) / 180 * Math.PI) * 0.1;
 		tools[actualWeapon][0].position.z = cubeZ + Math.cos((angle) / 180 * Math.PI) * 0.1;
 		tools[actualWeapon][0].position.y = cube.mesh.position.y + 0.3;
-		tools[actualWeapon][0].rotation.y = (angle + tools[actualWeapon][0].___turn[0]) / 180 * Math.PI;
+		tools[actualWeapon][0].rotation.y = (angle + tools[actualWeapon][0].___turn[1]) / 180 * Math.PI;
 		if(tools[actualWeapon][0].isReloading == true){
 			tools[actualWeapon][0].rotation.x = 45 / 180 * Math.PI;
 		}else{
@@ -578,8 +592,8 @@ function render() {
 }
 
 actualWeapon = 0;
+/*
 setInterval(() => {
-	walk();
 	for (let enemy of enemies) {
 		if (true || enemy.mesh.shot.length == 0) {
 			enemy.mesh.position.y = 0.1 + enemy.mesh.geometry.parameters.height / 2 + getFirstIntersection(enemy.mesh.position.x, enemy.mesh.position.y, enemy.mesh.position.z, 1, enemy).y
@@ -611,7 +625,8 @@ setInterval(() => {
 
 		}
 	}
-}, 200)
+}, 200)//cube
+*/
 fill([50, 50]);
 dune();
 for (let object of objects) {
@@ -640,6 +655,8 @@ function onWindowResize() {
 
 
 var lightX = 0;
+speed = speed
+setInterval(walk,200);
 setInterval(function() {
 	lightX += 0.002
 	let a = 2
