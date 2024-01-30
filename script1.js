@@ -105,11 +105,17 @@ document.body.addEventListener("mousedown", async () => {
 				shoot();
 				tools[actualWeapon][1].lastshot = Date.now();
 				tools[actualWeapon][1].actualMag -= 1;
+				if(tools[actualWeapon][1].actualMag == 0){
+					tools[actualWeapon][0].isReloading = true;
+				}
 				interval = setInterval(() => {
 					if (tools[actualWeapon][1].actualMag > 0) {
 						shoot();
 						tools[actualWeapon][1].lastshot = Date.now();
 						tools[actualWeapon][1].actualMag -= 1;
+						if(tools[actualWeapon][1].actualMag == 0){
+							tools[actualWeapon][0].isReloading = true;
+						}
 					} else {
 						tools[actualWeapon][0].isReloading = true;
 						setTimeout((w,a_w) => { w.actualMag = w.mag;a_w.isReloading = false}, tools[actualWeapon][1].reloadtime, tools[actualWeapon][1],tools[actualWeapon][0]);
@@ -279,7 +285,7 @@ function jumpend() {
 		ableToJump = true;
 	}, 500)
 }
-var speed = 3;
+var speed = 4;
 var angle = 0;
 var mouseMoveX = 0;
 var mouseMoveY = 0;
@@ -546,8 +552,8 @@ function walk() {
 			tools[actualWeapon][0].rotation.x = 0 / 180 * Math.PI;
 		}
 	}
-	cube.mesh.position.x = cube.mesh.position.x % (changHalfSize-2);
-	cube.mesh.position.z = cube.mesh.position.z % (changHalfSize-2);
+	cube.mesh.position.x = ((cube.mesh.position.x+3*changHalfSize) % (changHalfSize*2))-changHalfSize;
+	cube.mesh.position.z = ((cube.mesh.position.z+3*changHalfSize) % (changHalfSize*2))-changHalfSize;
 }
 function render() {
 	angle += change[0];
