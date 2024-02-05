@@ -24,7 +24,7 @@ document.body.appendChild(renderer.domElement);
 var planeGeometry = new THREE.PlaneGeometry(500, 500, 40, 40);
 var playerLifes = 150;
 var cubeLives = 150;
-var cubeDamage = 0;//20;
+var cubeDamage = 20;
 //0xf0e68c
 var material = new THREE.MeshPhongMaterial({ color: 0xf0e68c, side: THREE.DoubleSide });
 // Create a mesh using the geometry and material
@@ -103,6 +103,7 @@ document.body.addEventListener("mousedown", async () => {
 					clearInterval(interval);
 				}
 				shoot();
+				change[2] -= (tools[actualWeapon][1].recoil/4) /180 * Math.PI;
 				tools[actualWeapon][1].lastshot = Date.now();
 				tools[actualWeapon][1].actualMag -= 1;
 				if(tools[actualWeapon][1].actualMag == 0){
@@ -111,8 +112,7 @@ document.body.addEventListener("mousedown", async () => {
 				interval = setInterval(() => {
 					if (tools[actualWeapon][1].actualMag > 0) {
 						shoot();
-						//CHANGE//
-						change[2] -= 0.5 /180 * Math.PI;
+						change[2] -= (tools[actualWeapon][1].recoil/4) /180 * Math.PI;
 						tools[actualWeapon][1].lastshot = Date.now();
 						tools[actualWeapon][1].actualMag -= 1;
 						if(tools[actualWeapon][1].actualMag == 0){
@@ -155,9 +155,11 @@ for (const file of Object.keys(fileNames)) {
 		console.log(file, i);
 		let scale = 0.001;
 		let turn = [0, 0, 0];
+		let pos_change = [0, 0, 0];
 		try {
 			scale = fileNames[file].scale;
 			turn = [fileNames[file].tx, fileNames[file].ty, fileNames[file].tz];
+			pos_change = [fileNames[file].x, fileNames[file].y, fileNames[file].z];
 			console.log(scale, turn);
 		} catch (e) {
 			console.log(e.message);
@@ -184,6 +186,7 @@ for (const file of Object.keys(fileNames)) {
 
 			obj.scale.set(scale, scale, scale);
 			obj.___turn = turn;
+			obj.___pos_change = pos_change;
 			console.log("adding object to tools");
 			fileNames[file].publicinf.actualMag = fileNames[file].publicinf.mag;
 			tools[i] = [obj, fileNames[file].publicinf];
@@ -319,17 +322,18 @@ function keypress(event) {
 			scene.remove(tools[actualWeapon][0]);
 			actualWeapon += 1;
 			actualWeapon %= (Object.keys(tools).length);
-			console.log(tools, actualWeapon);
+			document.getElementById("gun-name").innerHTML = tools[actualWeapon][1].name;
+			//console.log(tools, actualWeapon);
 			scene.add(tools[actualWeapon][0]);
 		}
-		console.log(actualWeapon)
+		//console.log(actualWeapon)
 	}
 	if (ableToJump && event.keyCode == 32) { cube.mesh.position.y += 4; if (!checkCollision()) { intheAir = true; ableToJump = false; window.setTimeout(jumpend, 1000) } else { cube.mesh.position.y -= 4; } }
 }
 
 function keyup(event) {
 	if (event.keyCode == 90 || event.keyCode == 89 || event.keyCode == 51) { dezoom() }
-	if (event.keyCode == 65) { change[0] = 0 }
+	if (event.keyCode == 65) { change[3] = 0 }
 	if (event.keyCode == 82 && tools[actualWeapon][1].actualMag > 0 && tools[actualWeapon][1].actualMag != tools[actualWeapon][1].mag) {
 														tools[actualWeapon][0].isReloading = true;
 														setTimeout((w,a_w) => { w.actualMag = w.mag;
@@ -341,7 +345,7 @@ function keyup(event) {
 																			); 
 													 }
 	if (event.keyCode == 87) { change[1] = 0 }
-	if (event.keyCode == 68) { change[0] = 0 }
+	if (event.keyCode == 68) { change[3] = 0 }
 	if (event.keyCode == 83) { change[1] = 0 }
 	if (event.keyCode == 32) { jumpend() }
 }
@@ -397,7 +401,9 @@ function sandstorm(isSandstorm = true) {
 		scene.fog.far = 100;
 	}
 }
-
+function randNum(a,b){
+	return Math.random()*b+a;
+}
 function shoot() {
 	if (shootingSoundeffect && shootingSoundeffect.currentTime > 0 && !shootingSoundeffect.paused && !shootingSoundeffect.ended && shootingSoundeffect.readyState > 2) {
 		shootingSoundeffect.currentTime = 0;
@@ -408,7 +414,7 @@ function shoot() {
 	let raycaster = new THREE.Raycaster();
 	let camPosition = camera.position.clone();
 	// Update the raycaster's position and direction using the cam's position and direction
-	raycaster.set(camPosition, new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion));
+	raycaster.set(camPosition, new THREE.Vector3(randNum(0,tools[actualWeapon][1].bsa)/2, randNum(0,tools[actualWeapon][1].bsa)/2, -1).applyQuaternion(camera.quaternion));
 	let intersects = raycaster.intersectObjects(enemies.concat(objects).map((obj) => obj.mesh));
 	if (intersects.length > 0) {
 		var shotObject = intersects[0].object;
@@ -556,9 +562,9 @@ function walk() {
 	dune();
 	if (tools[actualWeapon] != undefined) {
 		tools[actualWeapon][0].rotation.reorder( 'YZX' );
-		tools[actualWeapon][0].position.x = cubeX + Math.sin((angle) / 180 * Math.PI) * 0.1;
-		tools[actualWeapon][0].position.z = cubeZ + Math.cos((angle) / 180 * Math.PI) * 0.1;
-		tools[actualWeapon][0].position.y = cube.mesh.position.y + 0.3;
+		tools[actualWeapon][0].position.x = cubeX + Math.sin((angle) / 180 * Math.PI) * -(0.5 + tools[actualWeapon][0].___pos_change[2]);
+		tools[actualWeapon][0].position.z = cubeZ + Math.cos((angle) / 180 * Math.PI) * -(0.5 + tools[actualWeapon][0].___pos_change[2]);
+		tools[actualWeapon][0].position.y = cube.mesh.position.y + 0.3 + tools[actualWeapon][0].___pos_change[1];
 		tools[actualWeapon][0].rotation.y = (angle + tools[actualWeapon][0].___turn[1]) / 180 * Math.PI;
 		if(tools[actualWeapon][0].isReloading == true){
 			tools[actualWeapon][0].rotation.x = 45 / 180 * Math.PI;
@@ -592,7 +598,7 @@ function render() {
 }
 
 actualWeapon = 0;
-/*
+///*
 setInterval(() => {
 	for (let enemy of enemies) {
 		if (true || enemy.mesh.shot.length == 0) {
@@ -626,7 +632,7 @@ setInterval(() => {
 		}
 	}
 }, 200)//cube
-*/
+//*/
 fill([50, 50]);
 dune();
 for (let object of objects) {
@@ -664,7 +670,7 @@ setInterval(function() {
 	ambientlight.intensity = brightness
 	document.getElementById("player-health").innerHTML = playerLifes;
 	document.getElementById("brightness").innerHTML = brightness;
-	console.log(tools, actualWeapon);
+	//console.log(tools, actualWeapon);
 	document.getElementById("magazine").innerHTML = tools[actualWeapon][1].actualMag;
 	document.getElementById("fullMagazine").innerHTML = tools[actualWeapon][1].mag;
 	try {
